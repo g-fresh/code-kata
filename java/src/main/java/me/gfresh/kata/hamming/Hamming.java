@@ -6,11 +6,11 @@ import java.util.stream.*;
 public final class Hamming {
 
 	public static int compute(String strandA, String strandB) {
-		Stream<NucleotidePair> nucleotidePairs = compare(strandA, strandB);
+		Stream<NucleotidePair> nucleotidePairs = sideBySide(strandA, strandB);
 		return countDifferences(nucleotidePairs);
 	}
 
-	private static Stream<NucleotidePair> compare(String strandA, String strandB) {
+	private static Stream<NucleotidePair> sideBySide(String strandA, String strandB) {
 		checkOfEqualLength(strandA, strandB);
 		Iterator<Character> as = asStream(strandA).iterator();
 		Stream<Character>   bs = asStream(strandB);
