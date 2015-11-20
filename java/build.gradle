@@ -3,10 +3,12 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 
 repositories {
-  mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-  testCompile "junit:junit:4.12"
+	testCompile "com.google.guava:guava:18.0"
+	testCompile "org.easytesting:fest-assert:1.4"
+	testCompile "junit:junit:4.12"
 }
 
