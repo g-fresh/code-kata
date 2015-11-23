@@ -40,7 +40,7 @@ public final class DNA {
 
 	private static Map<Character, Integer> countNucleotides(Stream<Character> nucleotides) {
 		Map<Character, Integer> counts = zero();
-		counts.putAll(nucleotides.map(validation).collect(groupingBy(identity(), counting())));
+		counts.putAll(nucleotides.map(validation).collect(groupingBy(identity(), counting)));
 		return counts;
 	}
 
@@ -50,7 +50,5 @@ public final class DNA {
 		return counts;
 	}
 
-	private static Collector<Object, ?, Integer> counting() {
-		return reducing(0, e -> 1, Integer::sum);
-	}
+	private static final Collector<Object, ?, Integer> counting = reducing(0, e -> 1, Integer::sum);
 }
