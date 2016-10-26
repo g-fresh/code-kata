@@ -1,0 +1,9 @@
+include 'anagram',
+	'bob',
+	'etl',
+	'hamming',
+	'meetup',
+	'nucleotidecount',
+	'robotname',
+	'say',
+	'wordcount'
