@@ -1,69 +1,43 @@
 
 object RailFenceCipher {
 
-  // Implemenation of encode
-  //
-  // Encode text "SECRET":
-  //    S . . . E .
-  //    . E . R . T
-  //    . . C . . .
-  //
-  // 1. Create pairs of (character, position)
-  //    (S,0), (E,1), (C,2), (R,3), (E,4), (T,5)
-  // 2. Apply encoding in order to calculate rail for each character
-  //    (S,0), (E,1), (C,2), (R,1), (E,0), (T,1)
-  // 3. Sort pairs by encoded positions (needs to be stable sort)
-  //    (S,0), (E,0), (E,1), (R,1), (T,1), (C,2)
-  // 4. Make string from the characters left to right
-  //
-  // Encoded text: "SEERTC"
-  //
-  def encode(text: String, rails: Int): String = {
-    val encoding = triangle(rails)
-    val charPositionsEncoded = for {
-      charPositions <- text.zipWithIndex
-      (char, pos) = charPositions
-    } yield (encoding(pos), char)
-    mkString(charPositionsEncoded.sorted)
-  }
+  def encode(text: String, rails: Int): String =
+    mapping(text.length, rails) map {
+      i => text(i._1)
+    } mkString
 
-  // Implemention of decode
-  //
-  // Decode text "SEERTC"
-  //
-  // 1. Calculate inverse encoding (rail -> position)
-  //    (0,0), (0,4), (1,1), (1,3), (1,5), (2,2)
-  // 2. Create pairs of (position, character) by applying inverse encoding
-  //    E.g.: (S, (0,0)) => (0,S)
-  //          (E, (0,4)) => (4,E)
-  //          ...
-  // 3. Sort the pairs in order to bring he characters back into the original 
-  //    order, then make a string going from left to right
-  //    (S,0), (E,1), (C,2), (R,3), (E,4), (T,5)
-  //
-  // Decoded text: "SECRET"
-  //
-  def decode(text: String, rails: Int): String = {
-    def inverseOf(f: Int => Int) = {
-      ( for (x <- 0 until text.length) yield (f(x), x) ).sorted
-    }
-    val encoding = inverseOf(triangle(rails))
-    val charPositionsDecoded = for {
-      charPositions <- text.toList.zip(encoding)
-      (char, (_, pos)) = charPositions
-    } yield (pos, char)
-    mkString(charPositionsDecoded.sorted)
-  }
+  def decode(text: String, rails: Int): String =
+    mapping(text.length, rails).sorted map {
+      i => text(i._2)
+    } mkString
 
-  private def triangle(rails: Int) = {
+  /* Returns the mapping from character index in the original text to the
+   * index in the ciphered text.
+   *
+   * The mapping is calculated by evaluating a triangle wave function in
+   * order to compute the corresponding rail for each character position
+   * in the original text.
+   *
+   *    S . . . E .      character  S E C R E T
+   *    . E . R . T      pos        0 1 2 3 4 5
+   *    . . C . . .      rail       0 1 2 1 0 1
+   *
+   * The sequence representing this mapping is sorted by rail number
+   * and numbered sequentially, dropping the rail numbers.
+   * The result is the mapping original to new character index.
+   */
+  private def mapping(textLength: Int, rails: Int): Seq[(Int, Int)] = {
+
     def triangle(frequency: Int, amplitude: Int)(x: Int): Int =
       amplitude - Math.abs((x % frequency) - amplitude)
-    triangle(2 * rails - 2, rails - 1)(_)
-  }
 
-  private def mkString(coding: Seq[(Int, Char)]) =
-    coding.foldRight(List[Char]()) {
-      case ((_, char), acc) => char :: acc
-    }.mkString
+    val amplitude = rails - 1
+    val frequency = 2 * amplitude
+    val f = triangle(frequency, amplitude)(_)
+    val rs = for (idx <- 0 until textLength) yield (f(idx), idx)
+    rs.sorted.zipWithIndex map {
+      case ((rail, index), newIndex) => (index, newIndex)
+    }
+  }
 }
 
