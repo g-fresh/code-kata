@@ -68,7 +68,7 @@ public class AnagramTest {
     public void testMultipleAnagrams() {
         Anagram detector = new Anagram("allergy");
         List<String> anagrams = detector.match(Arrays.asList(
-        		"gallery", "ballerina", "regally", "clergy", "largely", "leading"));
+                "gallery", "ballerina", "regally", "clergy", "largely", "leading"));
         assertThat(anagrams, hasItems("gallery", "largely", "regally"));
     }
 
@@ -81,11 +81,11 @@ public class AnagramTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void throwsExceptionOnNullConstructorArgument() {
-    	new Anagram(null);
+        new Anagram(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void throwsExceptionOnNullArgument() {
-    	new Anagram("foo").match(null);
+        new Anagram("foo").match(null);
     }
 }

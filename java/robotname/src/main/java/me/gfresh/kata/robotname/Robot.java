@@ -5,66 +5,66 @@ import java.util.function.*;
 
 public final class Robot {
 
-	private String name;
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	void setName(String name) {
-		this.name = name;
-	}
+    void setName(String name) {
+        this.name = name;
+    }
 }
 
 final class Factory {
 
-	private NameGenerator generator = new NameGenerator();
+    private NameGenerator generator = new NameGenerator();
 
-	public Robot makeRobot() {
-		return reset(new Robot());
-	}
+    public Robot makeRobot() {
+        return reset(new Robot());
+    }
 
-	public Robot reset(Robot robot) {
-		robot.setName(generator.generateUniqueName());
-		return robot;
-	}
+    public Robot reset(Robot robot) {
+        robot.setName(generator.generateUniqueName());
+        return robot;
+    }
 
-	private class NameGenerator {
+    private class NameGenerator {
 
-		private Random rnd = new Random();
-		private BloomFilter names = new BloomFilter(4208777,
-			name ->
-				new Integer[] {
-					name.hashCode(),
-					(name + "foo").hashCode(),
-					(name + "bar").hashCode(),
-					(name + "baz").hashCode()
-				});
+        private Random rnd = new Random();
+        private BloomFilter names = new BloomFilter(4208777,
+            name ->
+                new Integer[] {
+                    name.hashCode(),
+                    (name + "foo").hashCode(),
+                    (name + "bar").hashCode(),
+                    (name + "baz").hashCode()
+                });
 
-		private String generateUniqueName() {
-			for (int i = 0; i < 1000; i++) {
-				String name = generateRandomName();
-				if (! alreadyUsed(name)) return name;
-			}
-			throw new RuntimeException("Ran out of available robot names");
-		}
+        private String generateUniqueName() {
+            for (int i = 0; i < 1000; i++) {
+                String name = generateRandomName();
+                if (! alreadyUsed(name)) return name;
+            }
+            throw new RuntimeException("Ran out of available robot names");
+        }
 
-		private String generateRandomName() {
-			return randomLetter() + randomLetter() + randomDigit() + randomDigit() + randomDigit();
-		}
+        private String generateRandomName() {
+            return randomLetter() + randomLetter() + randomDigit() + randomDigit() + randomDigit();
+        }
 
-		private String randomLetter() {
-			return String.valueOf((char) ('A' + rnd.nextInt(26)));
-		}
+        private String randomLetter() {
+            return String.valueOf((char) ('A' + rnd.nextInt(26)));
+        }
 
-		private String randomDigit() {
-			return String.valueOf(rnd.nextInt(10));
-		}
+        private String randomDigit() {
+            return String.valueOf(rnd.nextInt(10));
+        }
 
-		private boolean alreadyUsed(String name) {
-			return ! names.add(name);
-		}
-	}
+        private boolean alreadyUsed(String name) {
+            return ! names.add(name);
+        }
+    }
 }
 
 /**
@@ -83,27 +83,27 @@ final class Factory {
  */
 final class BloomFilter {
 
-	private int size;
-	private Function<String, Integer[]> hashFunctions;
-	private BitSet bits;
+    private int size;
+    private Function<String, Integer[]> hashFunctions;
+    private BitSet bits;
 
-	public BloomFilter(int size, Function<String, Integer[]> hashFunctions) {
-		this.size = size;
-		this.hashFunctions = hashFunctions;
-		this.bits = new BitSet(size);
-	}
+    public BloomFilter(int size, Function<String, Integer[]> hashFunctions) {
+        this.size = size;
+        this.hashFunctions = hashFunctions;
+        this.bits = new BitSet(size);
+    }
 
-	boolean add(String element) {
-		boolean wasPresent = true;
-		for (int hash : hashFunctions.apply(element)) {
-			int pos = bitPosition(hash);
-			wasPresent &= bits.get(pos);
-			bits.set(pos);
-		}
-		return ! wasPresent;
-	}
+    boolean add(String element) {
+        boolean wasPresent = true;
+        for (int hash : hashFunctions.apply(element)) {
+            int pos = bitPosition(hash);
+            wasPresent &= bits.get(pos);
+            bits.set(pos);
+        }
+        return ! wasPresent;
+    }
 
-	private int bitPosition(int hash) {
-		return Math.abs(hash) % size;
-	}
+    private int bitPosition(int hash) {
+        return Math.abs(hash) % size;
+    }
 }
